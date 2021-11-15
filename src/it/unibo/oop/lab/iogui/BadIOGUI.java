@@ -1,14 +1,21 @@
 package it.unibo.oop.lab.iogui;
 
+import java.nio.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Random;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -41,9 +48,27 @@ public class BadIOGUI {
         canvas.add(write, BorderLayout.CENTER);
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //ex 01.01
+        final JPanel pane = new JPanel();
+        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
+        pane.add(write);
+        frame.add(pane, BorderLayout.CENTER);
+        //ex 01.02
+        final JButton read = new JButton("Read");
+        pane.add(read);
         /*
          * Handlers
          */
+        read.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                try {
+                    System.out.println(Files.readAllLines(Path.of(PATH)));
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -83,6 +108,7 @@ public class BadIOGUI {
          * on screen. Results may vary, but it is generally the best choice.
          */
         frame.setLocationByPlatform(true);
+        frame.pack();
         /*
          * OK, ready to pull the frame onscreen
          */
