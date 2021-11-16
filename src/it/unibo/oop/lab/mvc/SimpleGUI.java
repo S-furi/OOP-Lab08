@@ -2,8 +2,16 @@ package it.unibo.oop.lab.mvc;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /**
  * A very simple program using a graphical interface.
@@ -11,7 +19,7 @@ import javax.swing.JFrame;
  */
 public final class SimpleGUI {
 
-    private final JFrame frame = new JFrame();
+    private final JFrame frame = new JFrame("My SimpleGUI");
 
     /*
      * Once the Controller is done, implement this class in such a way that:
@@ -36,9 +44,52 @@ public final class SimpleGUI {
 
     /**
      * builds a new {@link SimpleGUI}.
+     * 
+     * @param controller
+     *              the controller of the GUI.
      */
-    public SimpleGUI() {
+    public SimpleGUI(final ControllerImpl controller) {
+        // Upper part of the frame
+        final JTextField showText = new JTextField();
+        final JPanel upperPane = new JPanel();
+        final JTextArea text = new JTextArea();
+        upperPane.setLayout(new BorderLayout());
+        showText.setEditable(false);
+        // Lower part of the frame
+        final JButton print = new JButton("Print");
+        final JButton history = new JButton("Show History");
+        final JPanel lowerPane = new JPanel();
+        // Creating buttons behaviour
+        print.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                try {
+                    controller.setNextString(text.getText());
+                    showText.setText(controller.getNextString());
+                    controller.printString();
+                } catch (IllegalArgumentException exc) {
+                    JOptionPane.showMessageDialog(frame, "Please, insert something in the textbox ...");
+                }
+            } 
+        });
+        history.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                showText.setText(controller.getHistory().toString());
+            }
+        });
+
+
+        // Adding components to panels
+        upperPane.add(showText, BorderLayout.NORTH);
+        upperPane.add(text, BorderLayout.CENTER);
+        lowerPane.add(print);
+        lowerPane.add(history);
+        // Adding components to the frame
+        this.frame.getContentPane().add(upperPane, BorderLayout.CENTER);
+        this.frame.getContentPane().add(lowerPane, BorderLayout.SOUTH);
         /*
          * Make the frame half the resolution of the screen. This very method is
          * enough for a single screen setup. In case of multiple monitors, the
@@ -49,6 +100,7 @@ public final class SimpleGUI {
          * MUCH better than manually specify the size of a window in pixel: it
          * takes into account the current resolution.
          */
+        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
         final int sw = (int) screen.getWidth();
         final int sh = (int) screen.getHeight();
@@ -62,4 +114,12 @@ public final class SimpleGUI {
         frame.setLocationByPlatform(true);
     }
 
+    private void show() {
+        frame.setVisible(true);
+    }
+
+    public static void main(final String[] args) {
+        final SimpleGUI gui = new SimpleGUI(new ControllerImpl());
+        gui.show();
+    }
 }
